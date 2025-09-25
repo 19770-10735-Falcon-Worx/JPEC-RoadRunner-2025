@@ -53,14 +53,16 @@ import java.util.List;
 
 @Config
 public final class MecanumDrive {
+    public static double VX_WEIGHT = 1;
+    public static double VY_WEIGHT = 1;
+    public static double OMEGA_WEIGHT = 1;
+
     public static class Params {
         // IMU orientation
         // TODO: fill in these values based on
         //   see https://ftc-docs.firstinspires.org/en/latest/programming_resources/imu/imu.html?highlight=imu#physical-hub-mounting
         public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
-                RevHubOrientationOnRobot.LogoFacingDirection.UP;
         public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
         // drive model parameters
         public double inPerTick = 1;
@@ -236,7 +238,6 @@ public final class MecanumDrive {
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // TODO: reverse motor directions if needed
-        //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
@@ -263,6 +264,27 @@ public final class MecanumDrive {
         leftBack.setPower(wheelVels.leftBack.get(0) / maxPowerMag);
         rightBack.setPower(wheelVels.rightBack.get(0) / maxPowerMag);
         rightFront.setPower(wheelVels.rightFront.get(0) / maxPowerMag);
+    }
+
+    public void setWeightedDrivePower(PoseVelocity2d drivePower) {
+        PoseVelocity2d vel = drivePower;
+
+        if (Math.abs(drivePower.linearVel.x) + Math.abs(drivePower.linearVel.y)
+                + Math.abs(drivePower.angVel) > 1) {
+            // re-normalize the powers according to the weights
+            double denom = VX_WEIGHT * Math.abs(drivePower.linearVel.x)
+                    + VY_WEIGHT * Math.abs(drivePower.linearVel.y)
+                    + OMEGA_WEIGHT * Math.abs(drivePower.angVel);
+
+            vel = new PoseVelocity2d(
+                    new Vector2d(
+                            VX_WEIGHT * drivePower.linearVel.x,
+                            VY_WEIGHT * drivePower.linearVel.y).div(denom),
+                    OMEGA_WEIGHT * drivePower.angVel
+            );
+        }
+
+        this.setDrivePowers(vel);
     }
 
     public final class FollowTrajectoryAction implements Action {
