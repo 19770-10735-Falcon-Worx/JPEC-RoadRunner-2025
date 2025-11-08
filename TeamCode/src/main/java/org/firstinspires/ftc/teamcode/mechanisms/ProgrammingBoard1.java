@@ -1,127 +1,98 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
 public class ProgrammingBoard1 {
 
-   // private DigitalChannel touchSensor;
-    private DcMotorEx shooterLeft;
-    private DcMotorEx shooterRight;
-   // private DcMotorEx motor_3;
+
+    private DcMotorEx shooterLeft, shooterRight, intake, transitionMotor;
+
+
     private double ticksPerRotation;
-   // private Servo servo;
-   // private AnalogInput pot;
-   // private ColorSensor colorSensor;
-   // private DistanceSensor distanceSensor;
-   // private IMU imu;
+    private CRServo turntable;
+
 
     public void init(HardwareMap hwMap) {
-        //touchSensor = hwMap.get(DigitalChannel.class, "touch_sensor");
-       // touchSensor.setMode(DigitalChannel.Mode.INPUT);
-        shooterLeft = hwMap.get(DcMotorEx.class, "shooterLeft");
+
+       shooterLeft = hwMap.get(DcMotorEx.class, "shooterLeft");
         shooterLeft.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         ticksPerRotation = shooterLeft.getMotorType().getTicksPerRev();
         shooterRight = hwMap.get(DcMotorEx.class, "shooterRight");
         shooterRight.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         ticksPerRotation = shooterRight.getMotorType().getTicksPerRev();
-       // motor_3 = hwMap.get(DcMotorEx.class, "motor 3");
-       // motor_3.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-       // ticksPerRotation = motor_3.getMotorType().getTicksPerRev();
-       // servo = hwMap.get(Servo.class, "servo");
-       // pot = hwMap.get(AnalogInput.class, "pot");
 
-       // colorSensor = hwMap.get(ColorSensor.class, "sensor_color_distance");
-       // distanceSensor = hwMap.get(DistanceSensor.class, "sensor_color_distance");
-       // imu = hwMap.get(IMU.class, "imu");
+        transitionMotor = hwMap.get(DcMotorEx.class, "transitionMotor");
+        transitionMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-       // RevHubOrientationOnRobot RevOrientation = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
-       // imu.initialize(new IMU.Parameters(RevOrientation));
+        intake = hwMap.get(DcMotorEx.class, "intake");
+        intake.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        intake.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+
+
+        turntable = hwMap.get(CRServo.class, "turntable");
+
     }
 
-    //public boolean getTouchSensorState() {
-      //  return !touchSensor.getState();
-    //}
+
 
     public void setShooterLeftSpeed(double speed) {
-        shooterLeft.setVelocity(-((speed/60)*28));
+        shooterLeft.setVelocity(-((speed / 60) * 28));
     }
 
     public void setShooterRightSpeed(double speed) {
-        shooterRight.setVelocity(((speed/60)*28));
+        shooterRight.setVelocity(((speed / 60) * 28));
     }
-
-    //public void setMotor3Speed(double speed) {
-      //  motor_3.setPower(speed);
-    //}
+    public void setIntakePower(double speed) {
+        intake.setPower(speed);
+    }
+    public void setTransitionMotorPower(double speed) {
+        transitionMotor.setPower(speed);
+    }
 
     public double getShooterLeftRotations() {
         return shooterLeft.getCurrentPosition() / ticksPerRotation;
     }
+
     public double getShooterLeftSpeed() {
-        return (-(shooterLeft.getVelocity()/28)*60);
+        return (-(shooterLeft.getVelocity() / 28) * 60);
     }
 
     public double getShooterRightRotations() {
         return shooterRight.getCurrentPosition() / ticksPerRotation;
     }
+
     public double getShooterRightSpeed() {
-        return ((shooterRight.getVelocity()/28)*60);
+        return ((shooterRight.getVelocity() / 28) * 60);
 
     }
 
-    //public double getMotor3Rotations() {
-      //  return motor_3.getCurrentPosition() / ticksPerRotation;
-    //}
 
+    public double getTurntablePosition() {
 
-    //public void setServoPosition(double position) {
-       // servo.setPosition(position);
-    //}
+        if (intake.getCurrentPosition() < 0) {
+            return 1 - Math.abs((intake.getCurrentPosition() / 8192.0) % 1);
+        }
+        return (intake.getCurrentPosition() / 8192.0) % 1;
+    }
 
-   // public double getPotAngle() {
-       // return Range.scale(pot.getVoltage(), 0, pot.getMaxVoltage(), 0, 270);
-   // }
+    public void setServoPower(double power) {
+        turntable.setPower(power);
+    }
 
-   // public int getAmountRed() {
-       // return colorSensor.red();
-   // }
+    public double getServoError(double target) {
+        double servoError = target - getTurntablePosition();
+        servoError = (servoError + 0.5) % 1;
+        if (servoError < 0) {
+            servoError += 1;
+        }
+        servoError -= 0.5;
 
-    //public int getAmountBlue() {
-      //  return colorSensor.blue();
-   // }
-
-   // public int getAmountGreen() {
-    //    return colorSensor.green();
-   // }
-
-    //public double getDistance(DistanceUnit du) {
-     //   return distanceSensor.getDistance(du);
-    //}
-
-   // public double getYaw(AngleUnit angleUnit) {
-   //     return imu.getRobotYawPitchRollAngles().getYaw(angleUnit);
-   // }
-
-  //  public double getPitch(AngleUnit angleUnit) {
-   //     return imu.getRobotYawPitchRollAngles().getPitch(angleUnit);
-   // }
-
-  //  public double getRoll(AngleUnit angleUnit) {
-  //      return imu.getRobotYawPitchRollAngles().getRoll(angleUnit);
-  //  }
-
+        return -servoError;
+        //negative is because the servo isn't inverted
+    }
 
 }
