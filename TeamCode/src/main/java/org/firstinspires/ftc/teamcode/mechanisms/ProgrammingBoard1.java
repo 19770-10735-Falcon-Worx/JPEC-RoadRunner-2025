@@ -5,7 +5,10 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-
+/**
+ * This is a class where all of the hardware exists, like motors or servos.
+ * @Hardware: Motors, servos, encoders
+ */
 public class ProgrammingBoard1 {
 
 
@@ -91,7 +94,7 @@ public class ProgrammingBoard1 {
         }
         servoError -= 0.5;
 
-        return -servoError;
+        return servoError;
         //negative is because the servo isn't inverted
     }
 

@@ -16,13 +16,13 @@ import org.firstinspires.ftc.teamcode.mechanisms.ProgrammingBoard1;
 
 @TeleOp
 public class exampleDrive extends OpMode {
-    double[] encoderPositions = {0.0, 0.3333, 0.6667};
+    double[] encoderPositions = {849043.0, 0.0, 0.3333, 0.6667};
     ProgrammingBoard1 board = new ProgrammingBoard1();
     boolean yPressed, shooterOn, rightTriggerPressed, leftTriggerPressed, downPressed, upPressed, rightBumperPressed, leftBumperPressed;
     private MecanumDrive m_drivetrain;
     private ThreeDeadWheelLocalizer m_localizer;
     int turntablePosition = 0;
-    double servoKP = 10, targetRPM = 3000;
+    double servoKP = 5, targetRPM = 6000;
 //    private OctoQuad m_OctoQuad;
 //    private HuskyLens m_HuskyLens;
 
@@ -45,6 +45,7 @@ public class exampleDrive extends OpMode {
                 gamepad1.left_stick_y,
                 gamepad1.left_stick_x
         );
+
         double yaw = -m_drivetrain.lazyImu.get().getRobotYawPitchRollAngles().getYaw();
         Pose2d heading = new Pose2d(new Vector2d(0, 0), Math.toRadians(yaw));
 
@@ -69,8 +70,8 @@ public class exampleDrive extends OpMode {
 
         yPressed = gamepad2.y;
         if (shooterOn) {
-            board.setShooterLeftSpeed(targetRPM);
-            board.setShooterRightSpeed(targetRPM);
+            board.setShooterLeftSpeed(3762.5 * (targetRPM / 6000));
+            board.setShooterRightSpeed(860 * (targetRPM / 6000));
         } else {
             board.setShooterLeftSpeed(0);
             board.setShooterRightSpeed(0);
@@ -85,28 +86,34 @@ public class exampleDrive extends OpMode {
         upPressed = gamepad2.dpad_up;
 
         /* Magazine control */
-        if (gamepad2.right_bumper && !rightBumperPressed)
+        if (gamepad2.right_bumper && !rightBumperPressed) {
             turntablePosition++;
-
+            if (turntablePosition > 3) {
+                turntablePosition = 1;
+            }
+        }
         rightBumperPressed = gamepad2.right_bumper;
 
-        if (gamepad2.left_bumper && !leftBumperPressed)
+        if (gamepad2.left_bumper && !leftBumperPressed) {
             turntablePosition--;
-
+            if (turntablePosition < 1) {
+                turntablePosition = 3;
+            }
+        }
         leftBumperPressed = gamepad2.left_bumper;
 
         /* Shooting control */
         if (gamepad2.right_trigger > 0.25) {
-            board.setTransitionMotorPower(1);
+            board.setTransitionMotorPower(-1);
 
         } else if (gamepad2.left_trigger > 0.25) {
-            board.setTransitionMotorPower(-1);
+            board.setTransitionMotorPower(1);
 
         } else {
             board.setTransitionMotorPower(0);
         }
 
-        double servoPower = board.getServoError(encoderPositions[turntablePosition % 3]) * servoKP;
+        double servoPower = board.getServoError(encoderPositions[turntablePosition]) * servoKP;
         telemetry.addData("servo power", servoPower);
         board.setServoPower(servoPower);
 
