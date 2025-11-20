@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.mechanisms.ProgrammingBoard1;
 
 @Autonomous
 
-public class Auton_2025 extends OpMode {
+public class Blue_Auton extends OpMode {
 
     ProgrammingBoard1 board = new ProgrammingBoard1();
     private MecanumDrive m_drivetrain;
