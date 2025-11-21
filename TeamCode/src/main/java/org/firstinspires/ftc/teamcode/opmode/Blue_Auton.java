@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.mechanisms.ProgrammingBoard1;
 
 
 @Autonomous
-
+// TODO: Add a button that runs during init (to change alliance) (ask pratt/nathan/westley for more info)
 public class Blue_Auton extends OpMode {
 
     ProgrammingBoard1 board = new ProgrammingBoard1();

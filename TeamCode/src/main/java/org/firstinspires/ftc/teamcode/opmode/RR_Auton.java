@@ -8,6 +8,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -15,6 +16,9 @@ import org.firstinspires.ftc.teamcode.ThreeDeadWheelLocalizer;
 import org.firstinspires.ftc.teamcode.mechanisms.ProgrammingBoard1;
 
 @Autonomous
+@Disabled
+
+// TODO: I disabled this auton so they don't think "RR" means "Red" or smth
 
 public class RR_Auton extends OpMode {
     ProgrammingBoard1 board = new ProgrammingBoard1();

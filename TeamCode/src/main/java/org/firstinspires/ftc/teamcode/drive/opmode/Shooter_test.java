@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -15,12 +16,15 @@ import java.util.List;
 
 
 @TeleOp
+@Disabled
 
 /*
  THIS IS FOR TESTING!
  I will change the values later!
  NOTE: I am also adding other parts not for the shooter tests in here, such as the vision processer
 */
+
+// TODO: Should we just delete this file? I added '@Disabled' so it doesn't accidentally get used
 
 public class Shooter_test extends OpMode {
     private final int CAMERA_WIDTH = 640;
