@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.ThreeDeadWheelLocalizer;
+import org.firstinspires.ftc.teamcode.mechanisms.FlowerSpintake;
 import org.firstinspires.ftc.teamcode.mechanisms.ProgrammingBoard1;
 import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.mechanisms.Transition;
@@ -22,11 +23,13 @@ import java.util.List;
 public class exampleDrive extends OpMode {
     double[] encoderPositions = {0.0, 0.3333, 0.6667};
     ProgrammingBoard1 board = new ProgrammingBoard1();
+    FlowerSpintake flowerSpintake = new FlowerSpintake();
+
     boolean yPressed, shooterOn, downPressed, upPressed, RBPressed, LBPressed, xPressed;
     private MecanumDrive m_drivetrain;
     private ThreeDeadWheelLocalizer m_localizer;
-//    private Transition m_transition;
-//    private Shooter m_shooter;
+    private Transition m_transition;
+   private Shooter m_shooter;
     int turntablePosition = 0;
     double servoKP = 5, shooterPercent = 100;
     FtcDashboard dash = FtcDashboard.getInstance();
@@ -41,6 +44,8 @@ public class exampleDrive extends OpMode {
         // TODO: It should also be mentioned that you should comment out m_transition
         //  and m_shooter while they aren't in use.
         board.init(hardwareMap);
+        flowerSpintake.init(hardwareMap);
+
         m_drivetrain = new MecanumDrive(this.hardwareMap, new Pose2d(new Vector2d(0d, 0d), 0d));
         m_localizer = (ThreeDeadWheelLocalizer) m_drivetrain.localizer;
 //        m_transition = new Transition(this.hardwareMap);
@@ -65,11 +70,12 @@ public class exampleDrive extends OpMode {
         m_drivetrain.setDrivePowers(new PoseVelocity2d(input, gamepad1.right_stick_x));
 
         /* Intake control */
+
         if (gamepad2.a) board.setIntakePower(-1);
         else if (gamepad2.b) board.setIntakePower(1);
         else board.setIntakePower(0);
 
-        /* Shooter Control */
+        // Shooter Control
         if (gamepad2.y && !yPressed) shooterOn = !shooterOn;
 
         if (shooterOn) {
@@ -80,6 +86,24 @@ public class exampleDrive extends OpMode {
             board.setShooterRightSpeed(0);
         }
 
+        // Spintake control
+/*
+        if(gamepad2.y){
+            flowerSpintake.setArmPosition(0.0);
+        }
+
+        if(gamepad2.b){
+            flowerSpintake.setArmPosition(1.0);
+        }
+
+        if(gamepad2.right_bumper){
+            flowerSpintake.spinner(-1.0);
+        }
+
+        if(gamepad2.left_bumper){
+            flowerSpintake.spinner(1.0);
+        }
+        */
         // TODO: Just like with a button, you can create a variable (shooterOnRan), and compare
         //  it to shooterOn; if shooterOn is true, but shooterOnRan isn't, run the loop.
         //  Make sure to update shooterOnRan to the same state as shooterOn in the 'Update Button Pressed' segment.
@@ -98,25 +122,30 @@ public class exampleDrive extends OpMode {
         if (gamepad2.dpad_up && !upPressed) shooterPercent += 5;
 
         /* Magazine control */
+        /*
         if (gamepad2.right_bumper && !RBPressed) turntablePosition++;
         if (gamepad2.left_bumper && !LBPressed) turntablePosition--;
+        */
+
 
         /* Shooting control */
         if (gamepad2.right_trigger > 0.25) board.setTransitionMotorPower(-1);
         else if (gamepad2.left_trigger > 0.25) board.setTransitionMotorPower(1);
         else board.setTransitionMotorPower(0);
 
-        // WIP: Run transition action
-//        if (gamepad2.x && !xPressed) {
-//            runningActions.add(m_transition.runTransition());
-//        }
-//        xPressed = gamepad2.x;
+        //WIP: Run transition action
+        if (gamepad2.x && !xPressed) {
+            runningActions.add(m_transition.runTransition());
+        }
+        xPressed = gamepad2.x;
 
         /* Update Button Pressed */
+
         yPressed = gamepad2.y;
 
         upPressed = gamepad2.dpad_up;
         downPressed = gamepad2.dpad_down;
+
 
         RBPressed = gamepad2.right_bumper;
         LBPressed = gamepad2.left_bumper;
@@ -142,6 +171,7 @@ public class exampleDrive extends OpMode {
         telemetry.addData("Rotation", Math.toDegrees(heading.heading.toDouble()));
         telemetry.addData("Shooter Speed Percentage", shooterPercent);
         telemetry.addData("Shooter On", shooterOn);
+        telemetry.addData("2026 ", "in the house!");
 
     }
 }
