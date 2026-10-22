@@ -41,6 +41,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagClusterDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
@@ -67,7 +68,7 @@ import java.util.List;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
 @TeleOp(name = "Concept: AprilTag Localization", group = "Concept")
-@Disabled
+
 public class ConceptAprilTagLocalization extends LinearOpMode {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
@@ -201,7 +202,7 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
         // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second (default)
         // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second (default)
         // Note: Decimation can be changed on-the-fly to adapt during a match.
-        //aprilTag.setDecimation(3);
+        aprilTag.setDecimation(2);
 
         // Create the vision portal by using a builder.
         VisionPortal.Builder builder = new VisionPortal.Builder();
@@ -214,7 +215,7 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
         }
 
         // Choose a camera resolution. Not all cameras support all resolutions.
-        //builder.setCameraResolution(new Size(640, 480));
+        // builder.setCameraResolution(new Size(640, 480));
 
         // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
         //builder.enableLiveView(true);
@@ -241,37 +242,55 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
     /**
      * Add telemetry about AprilTag detections.
      */
+
     private void telemetryAprilTag() {
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         telemetry.addData("# AprilTags Detected", currentDetections.size());
 
-        // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
+
             if (detection instanceof AprilTagSingleDetection) {
                 AprilTagSingleDetection singleDet = (AprilTagSingleDetection) detection;
 
                 if (singleDet.metadata != null) {
                     telemetry.addLine(String.format("\n==== (ID %d) %s", singleDet.id, singleDet.metadata.name));
-                    telemetry.addLine(String.format("Robot XYZ %6.1f %6.1f %6.1f  (inch)",
-                            detection.robotPose.getPosition().x,
-                            detection.robotPose.getPosition().y,
-                            detection.robotPose.getPosition().z));
-                    telemetry.addLine(String.format("Robot PRY %6.1f %6.1f %6.1f  (deg)",
-                            detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES),
-                            detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES),
-                            detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES)));
+                    showRobotPose(detection);
                 } else {
                     telemetry.addLine(String.format("\n==== (ID %d) Unknown", singleDet.id));
                     telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", singleDet.center.x, singleDet.center.y));
                 }
-            }
-        }   // end for() loop
 
-        // Add "key" information to telemetry
+            } else if (detection instanceof AprilTagClusterDetection) {
+                AprilTagClusterDetection clusterDet = (AprilTagClusterDetection) detection;
+                String name = (clusterDet.metadata != null) ? clusterDet.metadata.name : "no metadata";
+                telemetry.addLine(String.format("\n==== Cluster (%s)", name));
+                telemetry.addLine(String.format("Percent tags found: %d", clusterDet.percentClusterFound));
+                showRobotPose(detection);
+
+            } else {
+                telemetry.addLine("\n==== Other detection type: " + detection.getClass().getSimpleName());
+            }
+        }
+
         telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
         telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
+    }
 
-    }   // end method telemetryAprilTag()
+    private void showRobotPose(AprilTagDetection detection) {
+        if (detection.robotPose == null) {
+            telemetry.addLine("robotPose is null (no field position)");
+            return;
+        }
+        telemetry.addLine(String.format("Robot XYZ %6.1f %6.1f %6.1f  (inch)",
+                detection.robotPose.getPosition().x,
+                detection.robotPose.getPosition().y,
+                detection.robotPose.getPosition().z));
+        telemetry.addLine(String.format("Robot PRY %6.1f %6.1f %6.1f  (deg)",
+                detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES),
+                detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES),
+                detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES)));
+    }
+  // end method telemetryAprilTag()
 
 }   // end class
