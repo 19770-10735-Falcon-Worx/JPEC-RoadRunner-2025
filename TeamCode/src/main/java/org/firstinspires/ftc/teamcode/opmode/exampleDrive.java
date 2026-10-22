@@ -23,7 +23,7 @@ import java.util.List;
 public class exampleDrive extends OpMode {
     double[] encoderPositions = {0.0, 0.3333, 0.6667};
     ProgrammingBoard1 board = new ProgrammingBoard1();
-    FlowerSpintake flowerSpintake = new FlowerSpintake();
+    //FlowerSpintake flowerSpintake = new FlowerSpintake();
 
     boolean yPressed, shooterOn, downPressed, upPressed, RBPressed, LBPressed, xPressed;
     private MecanumDrive m_drivetrain;
@@ -44,7 +44,7 @@ public class exampleDrive extends OpMode {
         // TODO: It should also be mentioned that you should comment out m_transition
         //  and m_shooter while they aren't in use.
         board.init(hardwareMap);
-        flowerSpintake.init(hardwareMap);
+        //flowerSpintake.init(hardwareMap);
 
         m_drivetrain = new MecanumDrive(this.hardwareMap, new Pose2d(new Vector2d(0d, 0d), 0d));
         m_localizer = (ThreeDeadWheelLocalizer) m_drivetrain.localizer;
@@ -129,10 +129,10 @@ public class exampleDrive extends OpMode {
 
 
         /* Shooting control */
-        if (gamepad2.right_trigger > 0.25) board.setTransitionMotorPower(-1);
+      /*  if (gamepad2.right_trigger > 0.25) board.setTransitionMotorPower(-1);
         else if (gamepad2.left_trigger > 0.25) board.setTransitionMotorPower(1);
         else board.setTransitionMotorPower(0);
-
+*/
         //WIP: Run transition action
         if (gamepad2.x && !xPressed) {
             runningActions.add(m_transition.runTransition());

@@ -55,16 +55,16 @@ public class Blue_Auton extends OpMode {
             board.setShooterRightSpeed(0);
             board.setShooterLeftSpeed(0);
         }
-        if (getRuntime() >= 3.5 && getRuntime() <= 4) {
+      /*  if (getRuntime() >= 3.5 && getRuntime() <= 4) {
             board.setTransitionMotorPower(-1);
         }
         if (getRuntime() >= 4.5 && getRuntime() <= 5) {
             board.setTransitionMotorPower(0);
-        }
+        } */
         if (getRuntime() >= 5.0 && getRuntime() <= 6.9) {
             targetPosition = 0.666667;
         }
-        if (getRuntime() >= 6.9 && getRuntime() <= 8) {
+       /* if (getRuntime() >= 6.9 && getRuntime() <= 8) {
             board.setTransitionMotorPower(-1);
         }
         if (getRuntime() >= 8 && getRuntime() <= 9) {
@@ -78,7 +78,7 @@ public class Blue_Auton extends OpMode {
         }
         if (getRuntime() >= 12 && getRuntime() <= 13) {
             board.setTransitionMotorPower(0);
-        }
+        } */
         if (getRuntime() >= 14 && getRuntime() <= 14.7) {
             m_drivetrain.setDrivePowers(new PoseVelocity2d(input, 0.5));
         }

@@ -62,8 +62,8 @@ public class Shooter_test extends OpMode {
         List<AprilTagDetection> currentDetections = aprilTagProcessor.getDetections();
         StringBuilder idsFound = new StringBuilder();
         for (AprilTagDetection detection : currentDetections) {
-            idsFound.append(detection.id);
-            telemetry.addData("X position", detection.center.x - CAMERA_WIDTH / 2);
+             //idsFound.append(detection.id);
+             //telemetry.addData("X position", detection.center.x - CAMERA_WIDTH / 2);
             idsFound.append(' ');
         }
         telemetry.addData("April Tags", idsFound);

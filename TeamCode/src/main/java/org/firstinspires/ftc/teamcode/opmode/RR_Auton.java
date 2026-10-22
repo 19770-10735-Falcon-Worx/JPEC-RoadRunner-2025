@@ -51,7 +51,7 @@ public class RR_Auton extends OpMode {
                 board.setShooterRightSpeed(1500);
                 shooterOn = true;
             }
-            board.setTransitionMotorPower(-1);
+            //board.setTransitionMotorPower(-1);
             double servoPower = board.getServoError(targetPosition) * 5;
             board.setServoPower(servoPower);
             return false;
