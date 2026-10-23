@@ -46,6 +46,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 
+import android.util.Size;
 import java.util.List;
 
 /*
@@ -215,7 +216,7 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
         }
 
         // Choose a camera resolution. Not all cameras support all resolutions.
-        // builder.setCameraResolution(new Size(640, 480));
+        builder.setCameraResolution(new Size(640, 480));
 
         // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
         //builder.enableLiveView(true);
