@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.ThreeDeadWheelLocalizer;
-import org.firstinspires.ftc.teamcode.mechanisms.ProgrammingBoard1NoShooter;
+import org.firstinspires.ftc.teamcode.mechanisms.ProgrammingBoard1;
 import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.mechanisms.Transition;
 
@@ -21,7 +21,7 @@ import java.util.List;
 @TeleOp
 public class exampleDriveNoShooter extends OpMode {
     double[] encoderPositions = {0.0, 0.3333, 0.6667};
-    ProgrammingBoard1NoShooter board = new ProgrammingBoard1NoShooter();
+    ProgrammingBoard1 board = new ProgrammingBoard1();
     //FlowerSpintake flowerSpintake = new FlowerSpintake();
 
     boolean yPressed, shooterOn, downPressed, upPressed, RBPressed, LBPressed, xPressed;
@@ -133,21 +133,21 @@ public class exampleDriveNoShooter extends OpMode {
         else board.setTransitionMotorPower(0);
 */
         //WIP: Run transition action
-        if (gamepad2.x && !xPressed) {
+        if (gamepad1.x && !xPressed) {
             runningActions.add(m_transition.runTransition());
         }
-        xPressed = gamepad2.x;
+        xPressed = gamepad1.x;
 
         /* Update Button Pressed */
 
-        yPressed = gamepad2.y;
+        yPressed = gamepad1.y;
 
-        upPressed = gamepad2.dpad_up;
-        downPressed = gamepad2.dpad_down;
+        upPressed = gamepad1.dpad_up;
+        downPressed = gamepad1.dpad_down;
 
 
-        RBPressed = gamepad2.right_bumper;
-        LBPressed = gamepad2.left_bumper;
+        RBPressed = gamepad1.right_bumper;
+        LBPressed = gamepad1.left_bumper;
 
         /* Magazine Mechanism */ // TODO: Move to ProgrammingBoard1 (Or better yet, mechanisms.Magazine)
         //double servoPower = board.getServoError(encoderPositions[turntablePosition % 3]) * servoKP;
