@@ -8,10 +8,14 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.ThreeDeadWheelLocalizer;
 import org.firstinspires.ftc.teamcode.mechanisms.FlowerSpintake;
+import org.firstinspires.ftc.teamcode.mechanisms.Loader;
+import org.firstinspires.ftc.teamcode.mechanisms.PIDConstants;
 import org.firstinspires.ftc.teamcode.mechanisms.ProgrammingBoard1;
 import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 import org.firstinspires.ftc.teamcode.mechanisms.Transition;
@@ -25,13 +29,13 @@ public class exampleDrive extends OpMode {
     ProgrammingBoard1 board = new ProgrammingBoard1();
     //FlowerSpintake flowerSpintake = new FlowerSpintake();
 
-    boolean yPressed, shooterOn, downPressed, upPressed, RBPressed, LBPressed, xPressed;
+    boolean yPressed, aPressed, bPressed, shooterOn, downPressed, upPressed, RBPressed, LBPressed, xPressed, LTPressed, RTPressed;
     private MecanumDrive m_drivetrain;
     private ThreeDeadWheelLocalizer m_localizer;
     private Transition m_transition;
-   private Shooter m_shooter;
-    int turntablePosition = 0;
-    double servoKP = 5, shooterPercent = 100;
+    private Shooter m_shooter;
+    private Loader m_loader;
+    double  shooterPercent = 1400;
     FtcDashboard dash = FtcDashboard.getInstance();
     List<Action> runningActions = new ArrayList<>();
 
@@ -48,8 +52,9 @@ public class exampleDrive extends OpMode {
 
         m_drivetrain = new MecanumDrive(this.hardwareMap, new Pose2d(new Vector2d(0d, 0d), 0d));
         m_localizer = (ThreeDeadWheelLocalizer) m_drivetrain.localizer;
-//        m_transition = new Transition(this.hardwareMap);
-//        m_shooter = new Shooter(this.hardwareMap);
+        m_transition = new Transition(this.hardwareMap);
+        m_shooter = new Shooter(this.hardwareMap);
+        m_loader = new Loader(this.hardwareMap);
     }
 
     @Override
@@ -58,8 +63,8 @@ public class exampleDrive extends OpMode {
         m_localizer.update();
 
         Vector2d input = new Vector2d(
-                -gamepad1.left_stick_y,
-                -gamepad1.left_stick_x
+                gamepad1.left_stick_y,
+                gamepad1.left_stick_x
         );
 
         double yaw = -m_drivetrain.lazyImu.get().getRobotYawPitchRollAngles().getYaw();
@@ -71,20 +76,27 @@ public class exampleDrive extends OpMode {
 
         /* Intake control */
 
-        if (gamepad2.a) board.setIntakePower(-1);
+        if (gamepad2.y) board.setIntakePower(-1);
         else if (gamepad2.b) board.setIntakePower(1);
         else board.setIntakePower(0);
 
         // Shooter Control
-        if (gamepad2.y && !yPressed) shooterOn = !shooterOn;
+        if (gamepad1.left_trigger > 0.25 && !LTPressed) shooterOn = !shooterOn;
 
         if (shooterOn) {
-            board.setShooterLeftSpeed(3762.5 * (shooterPercent / 100.0));
-            board.setShooterRightSpeed(860.0 * (shooterPercent / 100.0));
+            m_shooter.setShooterSpeed(shooterPercent);
         } else {
-            board.setShooterLeftSpeed(0);
-            board.setShooterRightSpeed(0);
+            m_shooter.setShooterSpeed(0);
         }
+
+
+        if (gamepad1.right_trigger > 0.25) {
+            m_loader.setLoaderMotorPower(-0.5);
+        } else {
+            m_loader.setLoaderMotorPower(0);
+        }
+
+
 
         // Spintake control
 /*
@@ -118,41 +130,36 @@ public class exampleDrive extends OpMode {
 //            runningActions.add(m_shooter.stopShooter());
 //        }
 
-        if (gamepad2.dpad_down && !downPressed) shooterPercent -= 5;
-        if (gamepad2.dpad_up && !upPressed) shooterPercent += 5;
+        if (gamepad1.dpad_down && !downPressed) shooterPercent -= 50;
+        if (gamepad1.dpad_up && !upPressed) shooterPercent += 50;
 
         /* Magazine control */
-        /*
-        if (gamepad2.right_bumper && !RBPressed) turntablePosition++;
-        if (gamepad2.left_bumper && !LBPressed) turntablePosition--;
-        */
 
 
         /* Shooting control */
-      /*  if (gamepad2.right_trigger > 0.25) board.setTransitionMotorPower(-1);
-        else if (gamepad2.left_trigger > 0.25) board.setTransitionMotorPower(1);
-        else board.setTransitionMotorPower(0);
-*/
+        if (gamepad2.x) m_transition.setTransitionMotorPower(-1);
+        else if (gamepad2.a) m_transition.setTransitionMotorPower(1);
+        else m_transition.setTransitionMotorPower(0);
+
         //WIP: Run transition action
-        if (gamepad2.x && !xPressed) {
-            runningActions.add(m_transition.runTransition());
-        }
-        xPressed = gamepad2.x;
+
+
 
         /* Update Button Pressed */
 
-        yPressed = gamepad2.y;
+        yPressed = gamepad1.y;
+        xPressed = gamepad1.x;
+        aPressed = gamepad1.a;
+        bPressed = gamepad1.b;
 
-        upPressed = gamepad2.dpad_up;
-        downPressed = gamepad2.dpad_down;
+        upPressed = gamepad1.dpad_up;
+        downPressed = gamepad1.dpad_down;
 
 
-        RBPressed = gamepad2.right_bumper;
-        LBPressed = gamepad2.left_bumper;
-
-        /* Magazine Mechanism */ // TODO: Move to ProgrammingBoard1 (Or better yet, mechanisms.Magazine)
-        double servoPower = board.getServoError(encoderPositions[turntablePosition % 3]) * servoKP;
-        board.setServoPower(servoPower);
+        RBPressed = gamepad1.right_bumper;
+        LBPressed = gamepad1.left_bumper;
+        LTPressed = gamepad1.left_trigger > 0.25;
+        RTPressed = gamepad1.right_trigger > 0.25;
 
         /* Command Scheduling */
         TelemetryPacket packet = new TelemetryPacket();
@@ -170,8 +177,17 @@ public class exampleDrive extends OpMode {
         dash.sendTelemetryPacket(packet); // Raw telemetry from command scheduling
         telemetry.addData("Rotation", Math.toDegrees(heading.heading.toDouble()));
         telemetry.addData("Shooter Speed Percentage", shooterPercent);
+        telemetry.addData("Shooter Current RPM", m_shooter.getShooterSpeed());
         telemetry.addData("Shooter On", shooterOn);
-        telemetry.addData("2026 ", "in the house!");
+        PIDFCoefficients newPID = new PIDFCoefficients(PIDConstants.P_VALUE, PIDConstants.I_VALUE, PIDConstants.D_VALUE, PIDConstants.F_VALUE);
+        m_shooter.setPIDF(newPID);
+        PIDFCoefficients currentPID = m_shooter.getPIDValues();
+        telemetry.addData("Current P", currentPID.p);
+        telemetry.addData("Current I", currentPID.i);
+        telemetry.addData("Current D", currentPID.d);
+        telemetry.addData("Current f", currentPID.f);
+        telemetry.addData("Version", "1.1");
+
 
     }
 }

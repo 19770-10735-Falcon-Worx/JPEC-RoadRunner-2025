@@ -21,20 +21,20 @@ public class ProgrammingBoard1 {
 
     public void init(HardwareMap hwMap) {
 
-        shooterLeft = hwMap.get(DcMotorEx.class, "shooterLeft");
-        shooterLeft.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        ticksPerRotation = shooterLeft.getMotorType().getTicksPerRev();
-        shooterRight = hwMap.get(DcMotorEx.class, "shooterRight");
-        shooterRight.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        ticksPerRotation = shooterRight.getMotorType().getTicksPerRev();
+//        shooterLeft = hwMap.get(DcMotorEx.class, "shooterLeft");
+//        shooterLeft.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+//        ticksPerRotation = shooterLeft.getMotorType().getTicksPerRev();
+//        shooterRight = hwMap.get(DcMotorEx.class, "shooterRight");
+//        shooterRight.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+//        ticksPerRotation = shooterRight.getMotorType().getTicksPerRev();
 
-        //transitionMotor = hwMap.get(DcMotorEx.class, "transitionMotor");
-        //transitionMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        transitionMotor = hwMap.get(DcMotorEx.class, "transition");
+        transitionMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-/*        intake = hwMap.get(DcMotorEx.class, "intake");
-        intake.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        intake = hwMap.get(DcMotorEx.class, "intake");
+
         intake.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-
+/*
 
         turntable = hwMap.get(CRServo.class, "turntable");
 */

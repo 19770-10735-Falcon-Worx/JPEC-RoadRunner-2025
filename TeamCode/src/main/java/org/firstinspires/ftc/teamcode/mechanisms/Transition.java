@@ -11,7 +11,7 @@ public class Transition {
     private final DcMotorEx transitionMotor;
 
     public Transition(HardwareMap hwMap) {
-        transitionMotor = hwMap.get(DcMotorEx.class, "transitionMotor");
+        transitionMotor = hwMap.get(DcMotorEx.class, "transition");
         transitionMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
