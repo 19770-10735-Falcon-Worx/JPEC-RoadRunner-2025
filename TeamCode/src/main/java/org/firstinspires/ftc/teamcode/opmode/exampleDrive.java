@@ -41,6 +41,7 @@ public class exampleDrive extends OpMode {
     private Shooter m_shooter2;
     private Loader m_loader;
     double  shooterRpm = 2900;
+    static final double REVERSE_RPM = 1200; // slow reverse to clear jams without a current spike
     private PIDFCoefficients appliedPIDF = null;
     FtcDashboard dash = FtcDashboard.getInstance();
     List<Action> runningActions = new ArrayList<>();
@@ -92,10 +93,13 @@ public class exampleDrive extends OpMode {
         // Shooter Control
         if (gamepad1.left_trigger > 0.25 && !LTPressed) shooterOn = !shooterOn;
 
-        if (shooterOn) {
+        // One command per loop: reverse (held) overrides the on/off toggle.
+        if (gamepad1.right_bumper) {
+            m_shooter.setShooterSpeed(-REVERSE_RPM);    // eject / clear jam
+            m_shooter2.setShooterSpeed(-REVERSE_RPM);
+        } else if (shooterOn) {
             m_shooter.setShooterSpeed(shooterRpm);
             m_shooter2.setShooterSpeed(shooterRpm);
-
         } else {
             m_shooter.setShooterSpeed(0);
             m_shooter2.setShooterSpeed(0);
@@ -107,8 +111,6 @@ public class exampleDrive extends OpMode {
         } else {
             m_loader.setLoaderMotorPower(0);
         }
-
-
 
         // Spintake control
 /*
