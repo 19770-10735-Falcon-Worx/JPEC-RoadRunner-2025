@@ -8,9 +8,13 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.ThreeDeadWheelLocalizer;
 import org.firstinspires.ftc.teamcode.mechanisms.FlowerSpintake;
@@ -34,8 +38,10 @@ public class exampleDrive extends OpMode {
     private ThreeDeadWheelLocalizer m_localizer;
     private Transition m_transition;
     private Shooter m_shooter;
+    private Shooter m_shooter2;
     private Loader m_loader;
-    double  shooterPercent = 1400;
+    double  shooterRpm = 2900;
+    private PIDFCoefficients appliedPIDF = null;
     FtcDashboard dash = FtcDashboard.getInstance();
     List<Action> runningActions = new ArrayList<>();
 
@@ -53,8 +59,11 @@ public class exampleDrive extends OpMode {
         m_drivetrain = new MecanumDrive(this.hardwareMap, new Pose2d(new Vector2d(0d, 0d), 0d));
         m_localizer = (ThreeDeadWheelLocalizer) m_drivetrain.localizer;
         m_transition = new Transition(this.hardwareMap);
-        m_shooter = new Shooter(this.hardwareMap);
+        m_shooter = new Shooter(this.hardwareMap, "shooter");
         m_loader = new Loader(this.hardwareMap);
+        m_shooter2 = new Shooter(this.hardwareMap, "shooter2");
+        m_shooter2.setDirectionReverse();
+        applyShooterPIDFIfChanged();
     }
 
     @Override
@@ -74,19 +83,22 @@ public class exampleDrive extends OpMode {
         if (gamepad1.share) m_drivetrain.lazyImu.get().resetYaw();
         m_drivetrain.setDrivePowers(new PoseVelocity2d(input, gamepad1.right_stick_x));
 
-        /* Intake control */
+        /* Intake control
 
         if (gamepad2.y) board.setIntakePower(-1);
         else if (gamepad2.b) board.setIntakePower(1);
-        else board.setIntakePower(0);
+        else board.setIntakePower(0); */
 
         // Shooter Control
         if (gamepad1.left_trigger > 0.25 && !LTPressed) shooterOn = !shooterOn;
 
         if (shooterOn) {
-            m_shooter.setShooterSpeed(shooterPercent);
+            m_shooter.setShooterSpeed(shooterRpm);
+            m_shooter2.setShooterSpeed(shooterRpm);
+
         } else {
             m_shooter.setShooterSpeed(0);
+            m_shooter2.setShooterSpeed(0);
         }
 
 
@@ -130,8 +142,8 @@ public class exampleDrive extends OpMode {
 //            runningActions.add(m_shooter.stopShooter());
 //        }
 
-        if (gamepad1.dpad_down && !downPressed) shooterPercent -= 50;
-        if (gamepad1.dpad_up && !upPressed) shooterPercent += 50;
+        if (gamepad1.dpad_down && !downPressed) shooterRpm -= 100;
+        if (gamepad1.dpad_up && !upPressed) shooterRpm += 100;
 
         /* Magazine control */
 
@@ -176,18 +188,32 @@ public class exampleDrive extends OpMode {
         /* Telemetry */
         dash.sendTelemetryPacket(packet); // Raw telemetry from command scheduling
         telemetry.addData("Rotation", Math.toDegrees(heading.heading.toDouble()));
-        telemetry.addData("Shooter Speed Percentage", shooterPercent);
+        telemetry.addData("Shooter Target RPM", shooterRpm);
         telemetry.addData("Shooter Current RPM", m_shooter.getShooterSpeed());
+        telemetry.addData("Shooter2 Current RPM", m_shooter2.getShooterSpeed());
         telemetry.addData("Shooter On", shooterOn);
-        PIDFCoefficients newPID = new PIDFCoefficients(PIDConstants.P_VALUE, PIDConstants.I_VALUE, PIDConstants.D_VALUE, PIDConstants.F_VALUE);
-        m_shooter.setPIDF(newPID);
-        PIDFCoefficients currentPID = m_shooter.getPIDValues();
+        applyShooterPIDFIfChanged();
+        /*PIDFCoefficients currentPID = m_shooter.getPIDValues();
         telemetry.addData("Current P", currentPID.p);
         telemetry.addData("Current I", currentPID.i);
         telemetry.addData("Current D", currentPID.d);
         telemetry.addData("Current f", currentPID.f);
-        telemetry.addData("Version", "1.1");
+        telemetry.addData("Version", "1.1"); */
+        telemetry.addData("backLeft Power", m_drivetrain.leftBack.getPower());
+        telemetry.addData("backLeft Current", m_drivetrain.leftBack.getCurrent(CurrentUnit.AMPS));
 
 
+    }
+
+    // Only send PIDF to the hub when the Dashboard values change; writing every loop wastes bus time.
+    private void applyShooterPIDFIfChanged() {
+        double p = PIDConstants.P_VALUE, i = PIDConstants.I_VALUE,
+               d = PIDConstants.D_VALUE, f = PIDConstants.F_VALUE;
+        if (appliedPIDF != null && appliedPIDF.p == p && appliedPIDF.i == i
+                && appliedPIDF.d == d && appliedPIDF.f == f) return;
+
+        appliedPIDF = new PIDFCoefficients(p, i, d, f);
+        m_shooter.setPIDF(appliedPIDF);
+        m_shooter2.setPIDF(appliedPIDF);
     }
 }

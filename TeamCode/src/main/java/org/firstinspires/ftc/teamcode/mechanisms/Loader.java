@@ -19,13 +19,20 @@ public class Loader {
         loaderMotor.setPower(speed);
     }
 
-    // TODO: Create an action to hold the motor in reverse so we can clear jams
+    // Runs the loader backward briefly to clear a jam
+    public SequentialAction reverseLoader(double seconds) {
+        return new SequentialAction(
+                new InstantAction(() -> setLoaderMotorPower(1)),
+                new SleepAction(seconds),
+                new InstantAction(() -> setLoaderMotorPower(0))
+        );
+    }
 
     public SequentialAction runLoader() {
         return new SequentialAction(
-                new InstantAction(()->setLoaderMotorPower(-1)),
+                new InstantAction(() -> setLoaderMotorPower(-1)),
                 new SleepAction(1.0),
-                new InstantAction(()->setLoaderMotorPower(0))
+                new InstantAction(() -> setLoaderMotorPower(0))
         );
     }
 }

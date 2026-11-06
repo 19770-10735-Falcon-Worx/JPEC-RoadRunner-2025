@@ -31,9 +31,9 @@ public class ProgrammingBoard1 {
         transitionMotor = hwMap.get(DcMotorEx.class, "transition");
         transitionMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        intake = hwMap.get(DcMotorEx.class, "intake");
+        //intake = hwMap.get(DcMotorEx.class, "intake");
 
-        intake.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        //intake.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 /*
 
         turntable = hwMap.get(CRServo.class, "turntable");
