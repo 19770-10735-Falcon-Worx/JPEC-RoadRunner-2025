@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.robotcontroller.external.samples;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @Autonomous
+@Disabled
 public class meetAuton extends LinearOpMode {
     private DcMotor shooter, transition, loader, leftFront, rightFront, leftBack, rightBack;
 

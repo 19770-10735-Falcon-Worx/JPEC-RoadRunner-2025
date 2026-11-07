@@ -40,8 +40,8 @@ public class exampleDrive extends OpMode {
     private Shooter m_shooter;
     private Shooter m_shooter2;
     private Loader m_loader;
-    double  shooterRpm = 2900;
-    static final double REVERSE_RPM = 1200; // slow reverse to clear jams without a current spike
+    double  shooterRpm = 4100;
+    static final double REVERSE_RPM = -1200; // slow reverse to clear jams without a current spike
     private PIDFCoefficients appliedPIDF = null;
     FtcDashboard dash = FtcDashboard.getInstance();
     List<Action> runningActions = new ArrayList<>();
@@ -94,13 +94,14 @@ public class exampleDrive extends OpMode {
         if (gamepad1.left_trigger > 0.25 && !LTPressed) shooterOn = !shooterOn;
 
         // One command per loop: reverse (held) overrides the on/off toggle.
-        if (gamepad1.right_bumper) {
-            m_shooter.setShooterSpeed(-REVERSE_RPM);    // eject / clear jam
-            m_shooter2.setShooterSpeed(-REVERSE_RPM);
+        if (gamepad1.left_bumper) {
+            m_shooter.setShooterSpeed(REVERSE_RPM);    // eject / clear jam
+            m_shooter2.setShooterSpeed(REVERSE_RPM);
         } else if (shooterOn) {
             m_shooter.setShooterSpeed(shooterRpm);
             m_shooter2.setShooterSpeed(shooterRpm);
         } else {
+
             m_shooter.setShooterSpeed(0);
             m_shooter2.setShooterSpeed(0);
         }
@@ -108,8 +109,10 @@ public class exampleDrive extends OpMode {
 
         if (gamepad1.right_trigger > 0.25) {
             m_loader.setLoaderMotorPower(-0.5);
+        } else if (gamepad1.right_bumper) {
+            m_loader.setLoaderMotorPower(0.5);
         } else {
-            m_loader.setLoaderMotorPower(0);
+            m_loader.setLoaderMotorPower(0.0);
         }
 
         // Spintake control
@@ -190,9 +193,9 @@ public class exampleDrive extends OpMode {
         /* Telemetry */
         dash.sendTelemetryPacket(packet); // Raw telemetry from command scheduling
         telemetry.addData("Rotation", Math.toDegrees(heading.heading.toDouble()));
-        telemetry.addData("Shooter Target RPM", shooterRpm);
-        telemetry.addData("Shooter Current RPM", m_shooter.getShooterSpeed());
-        telemetry.addData("Shooter2 Current RPM", m_shooter2.getShooterSpeed());
+        telemetry.addData("Shooter TARGET RPM", shooterRpm);
+        telemetry.addData("Shooter ACTUAL RPM", m_shooter.getShooterSpeed());
+        telemetry.addData("Second shooter ACTUAL RPM", m_shooter2.getShooterSpeed());
         telemetry.addData("Shooter On", shooterOn);
         applyShooterPIDFIfChanged();
         /*PIDFCoefficients currentPID = m_shooter.getPIDValues();

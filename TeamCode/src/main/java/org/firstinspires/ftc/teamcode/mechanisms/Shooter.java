@@ -18,7 +18,6 @@ public class Shooter {
     public Shooter(HardwareMap hwMap, String motorName) {
         shooter = hwMap.get(DcMotorEx.class, motorName);
         shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
     }
     public void setPIDF(PIDFCoefficients cof) {
         shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, cof);

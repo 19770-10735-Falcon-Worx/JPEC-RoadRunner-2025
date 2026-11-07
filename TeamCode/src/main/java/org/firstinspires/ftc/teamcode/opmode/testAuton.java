@@ -14,11 +14,12 @@ import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
 public class testAuton extends LinearOpMode {
     private DcMotor transition, loader, leftFront, rightFront, leftBack, rightBack;
     private Shooter m_shooter, m_shooter2;
-    double shooterRPM = 2100.0;
+    double shooterRPM = 4100.0;
 
     public void init(HardwareMap hwMap){
         m_shooter = new Shooter(this.hardwareMap, "shooter");
         m_shooter2 = new Shooter(this.hardwareMap, "shooter2");
+        m_shooter2.setDirectionReverse();
         transition = hwMap.get(DcMotor.class, "transition");
         transition.setDirection(DcMotorSimple.Direction.REVERSE);
         loader = hwMap.get(DcMotor.class, "loader");
@@ -40,7 +41,7 @@ public class testAuton extends LinearOpMode {
         waitForStart();
         m_shooter.setShooterSpeed(shooterRPM);
         m_shooter2.setShooterSpeed(shooterRPM);
-        sleep(2000);
+        sleep(15000);
         transition.setPower(1.0);
         sleep(200);
         loader.setPower(1.0);
@@ -53,7 +54,7 @@ public class testAuton extends LinearOpMode {
         rightBack.setPower(0.5);
         leftFront.setPower(0.5);
         rightFront.setPower(0.5);
-        sleep(2000);
+        sleep(500);
         leftBack.setPower(0.0);
         rightBack.setPower(0.0);
         leftFront.setPower(0.0);

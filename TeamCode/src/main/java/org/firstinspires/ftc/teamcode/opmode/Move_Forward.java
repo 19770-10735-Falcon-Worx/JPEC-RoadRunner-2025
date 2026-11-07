@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.ThreeDeadWheelLocalizer;
 import org.firstinspires.ftc.teamcode.mechanisms.ProgrammingBoard1;
 
-
+@Disabled
 @Autonomous
 // TODO: Add a button that runs during init (to change alliance) (ask pratt/nathan/westley for more info)
 public class Move_Forward extends OpMode {
@@ -22,6 +22,7 @@ public class Move_Forward extends OpMode {
     private double targetPosition;
 
     @Override
+
     public void init() {
         board.init(hardwareMap);
         m_drivetrain = new MecanumDrive(this.hardwareMap, new Pose2d(new Vector2d(0d, 0d), 0d));
