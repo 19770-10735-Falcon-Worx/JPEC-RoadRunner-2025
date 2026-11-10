@@ -8,20 +8,12 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.ThreeDeadWheelLocalizer;
-import org.firstinspires.ftc.teamcode.mechanisms.FlowerSpintake;
 import org.firstinspires.ftc.teamcode.mechanisms.Loader;
-import org.firstinspires.ftc.teamcode.mechanisms.PIDConstants;
 import org.firstinspires.ftc.teamcode.mechanisms.ProgrammingBoard1;
-import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
+import org.firstinspires.ftc.teamcode.mechanisms.Shooter2026;
 import org.firstinspires.ftc.teamcode.mechanisms.Transition;
 
 import java.util.ArrayList;
@@ -29,7 +21,6 @@ import java.util.List;
 
 @TeleOp
 public class exampleDrive extends OpMode {
-    double[] encoderPositions = {0.0, 0.3333, 0.6667};
     ProgrammingBoard1 board = new ProgrammingBoard1();
     //FlowerSpintake flowerSpintake = new FlowerSpintake();
 
@@ -37,12 +28,10 @@ public class exampleDrive extends OpMode {
     private MecanumDrive m_drivetrain;
     private ThreeDeadWheelLocalizer m_localizer;
     private Transition m_transition;
-    private Shooter m_shooter;
-    private Shooter m_shooter2;
+    private Shooter2026 m_shooter;
     private Loader m_loader;
-    double  shooterRpm = 4100;
+    double  shooterRpm = 2900;
     static final double REVERSE_RPM = -1200; // slow reverse to clear jams without a current spike
-    private PIDFCoefficients appliedPIDF = null;
     FtcDashboard dash = FtcDashboard.getInstance();
     List<Action> runningActions = new ArrayList<>();
 
@@ -60,11 +49,7 @@ public class exampleDrive extends OpMode {
         m_drivetrain = new MecanumDrive(this.hardwareMap, new Pose2d(new Vector2d(0d, 0d), 0d));
         m_localizer = (ThreeDeadWheelLocalizer) m_drivetrain.localizer;
         m_transition = new Transition(this.hardwareMap);
-        m_shooter = new Shooter(this.hardwareMap, "shooter");
         m_loader = new Loader(this.hardwareMap);
-        m_shooter2 = new Shooter(this.hardwareMap, "shooter2");
-        m_shooter2.setDirectionReverse();
-        applyShooterPIDFIfChanged();
     }
 
     @Override
@@ -95,17 +80,14 @@ public class exampleDrive extends OpMode {
 
         // One command per loop: reverse (held) overrides the on/off toggle.
         if (gamepad1.left_bumper) {
-            m_shooter.setShooterSpeed(REVERSE_RPM);    // eject / clear jam
-            m_shooter2.setShooterSpeed(REVERSE_RPM);
+            m_shooter.setTargetRPM(REVERSE_RPM);    // eject / clear jam
         } else if (shooterOn) {
-            m_shooter.setShooterSpeed(shooterRpm);
-            m_shooter2.setShooterSpeed(shooterRpm);
+            m_shooter.setTargetRPM(shooterRpm);
         } else {
 
-            m_shooter.setShooterSpeed(0);
-            m_shooter2.setShooterSpeed(0);
+            m_shooter.setTargetRPM(0);
         }
-
+        m_shooter.update();
 
         if (gamepad1.right_trigger > 0.25) {
             m_loader.setLoaderMotorPower(-0.5);
@@ -115,24 +97,6 @@ public class exampleDrive extends OpMode {
             m_loader.setLoaderMotorPower(0.0);
         }
 
-        // Spintake control
-/*
-        if(gamepad2.y){
-            flowerSpintake.setArmPosition(0.0);
-        }
-
-        if(gamepad2.b){
-            flowerSpintake.setArmPosition(1.0);
-        }
-
-        if(gamepad2.right_bumper){
-            flowerSpintake.spinner(-1.0);
-        }
-
-        if(gamepad2.left_bumper){
-            flowerSpintake.spinner(1.0);
-        }
-        */
         // TODO: Just like with a button, you can create a variable (shooterOnRan), and compare
         //  it to shooterOn; if shooterOn is true, but shooterOnRan isn't, run the loop.
         //  Make sure to update shooterOnRan to the same state as shooterOn in the 'Update Button Pressed' segment.
@@ -194,16 +158,8 @@ public class exampleDrive extends OpMode {
         dash.sendTelemetryPacket(packet); // Raw telemetry from command scheduling
         telemetry.addData("Rotation", Math.toDegrees(heading.heading.toDouble()));
         telemetry.addData("Shooter TARGET RPM", shooterRpm);
-        telemetry.addData("Shooter ACTUAL RPM", m_shooter.getShooterSpeed());
-        telemetry.addData("Second shooter ACTUAL RPM", m_shooter2.getShooterSpeed());
+        telemetry.addData("Shooter ACTUAL RPM", m_shooter.getShooterRPM());
         telemetry.addData("Shooter On", shooterOn);
-        applyShooterPIDFIfChanged();
-        /*PIDFCoefficients currentPID = m_shooter.getPIDValues();
-        telemetry.addData("Current P", currentPID.p);
-        telemetry.addData("Current I", currentPID.i);
-        telemetry.addData("Current D", currentPID.d);
-        telemetry.addData("Current f", currentPID.f);
-        telemetry.addData("Version", "1.1"); */
         telemetry.addData("backLeft Power", m_drivetrain.leftBack.getPower());
         telemetry.addData("backLeft Current", m_drivetrain.leftBack.getCurrent(CurrentUnit.AMPS));
 
@@ -211,14 +167,6 @@ public class exampleDrive extends OpMode {
     }
 
     // Only send PIDF to the hub when the Dashboard values change; writing every loop wastes bus time.
-    private void applyShooterPIDFIfChanged() {
-        double p = PIDConstants.P_VALUE, i = PIDConstants.I_VALUE,
-               d = PIDConstants.D_VALUE, f = PIDConstants.F_VALUE;
-        if (appliedPIDF != null && appliedPIDF.p == p && appliedPIDF.i == i
-                && appliedPIDF.d == d && appliedPIDF.f == f) return;
 
-        appliedPIDF = new PIDFCoefficients(p, i, d, f);
-        m_shooter.setPIDF(appliedPIDF);
-        m_shooter2.setPIDF(appliedPIDF);
-    }
+
 }

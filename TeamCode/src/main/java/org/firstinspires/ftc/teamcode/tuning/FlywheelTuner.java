@@ -39,11 +39,11 @@ public class FlywheelTuner extends LinearOpMode {
     public static double kS = 0.0;
     public static double kV = 0.0;
     public static double kP = 0.0;
-    public static double NOMINAL_VOLTAGE = 12.0;   // voltage the gains were tuned at
+    public static double NOMINAL_VOLTAGE = 12.58;   // voltage the gains were tuned at
 
     // ---- Change these to match your robot config ----
-    private static final String LEFT_NAME  = "flywheelLeft";
-    private static final String RIGHT_NAME = "flywheelRight";
+    private static final String LEFT_NAME  = "shooter";
+    private static final String RIGHT_NAME = "shooter2";
 
     @Override
     public void runOpMode() {
