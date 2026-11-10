@@ -22,7 +22,6 @@ import java.util.List;
 @TeleOp
 public class exampleDrive extends OpMode {
     ProgrammingBoard1 board = new ProgrammingBoard1();
-    //FlowerSpintake flowerSpintake = new FlowerSpintake();
 
     boolean yPressed, aPressed, bPressed, shooterOn, downPressed, upPressed, RBPressed, LBPressed, xPressed, LTPressed, RTPressed;
     private MecanumDrive m_drivetrain;
@@ -50,6 +49,7 @@ public class exampleDrive extends OpMode {
         m_localizer = (ThreeDeadWheelLocalizer) m_drivetrain.localizer;
         m_transition = new Transition(this.hardwareMap);
         m_loader = new Loader(this.hardwareMap);
+        m_shooter = new Shooter2026(this.hardwareMap);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class exampleDrive extends OpMode {
             m_shooter.setTargetRPM(shooterRpm);
         } else {
 
-            m_shooter.setTargetRPM(0);
+            m_shooter.setTargetRPM(0.0);
         }
         m_shooter.update();
 
