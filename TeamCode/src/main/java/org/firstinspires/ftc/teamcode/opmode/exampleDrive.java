@@ -29,7 +29,7 @@ public class exampleDrive extends OpMode {
     private Transition m_transition;
     private Shooter2026 m_shooter;
     private Loader m_loader;
-    double  shooterRpm = 3300;
+    double  shooterRpm = 3200;
     static final double REVERSE_RPM = -1200; // slow reverse to clear jams without a current spike
     FtcDashboard dash = FtcDashboard.getInstance();
     List<Action> runningActions = new ArrayList<>();
