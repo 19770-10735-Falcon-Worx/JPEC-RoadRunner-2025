@@ -89,10 +89,22 @@ public class exampleDrive extends OpMode {
         }
         m_shooter.update();
 
-        if (gamepad1.right_trigger > 0.25) {
+/*        if (gamepad1.right_trigger > 0.25) {
             m_loader.setLoaderMotorPower(-0.5);
         } else if (gamepad1.right_bumper) {
             m_loader.setLoaderMotorPower(0.5);
+        } else {
+            m_loader.setLoaderMotorPower(0.0);
+        } */
+
+        // Loader: feed only when the flywheel is at speed. Reverse (unjam) is never blocked.
+        boolean feedRequested = gamepad1.right_trigger > 0.25;
+        boolean shooterReady = m_shooter.isReady();
+
+        if (feedRequested && shooterReady) {
+            m_loader.setLoaderMotorPower(-0.5);      // feed
+        } else if (gamepad1.right_bumper) {
+            m_loader.setLoaderMotorPower(0.5);       // reverse to clear a jam
         } else {
             m_loader.setLoaderMotorPower(0.0);
         }
