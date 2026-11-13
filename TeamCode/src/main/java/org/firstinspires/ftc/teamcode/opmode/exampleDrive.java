@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
+import android.os.Build;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
@@ -8,7 +10,6 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.ThreeDeadWheelLocalizer;
 import org.firstinspires.ftc.teamcode.mechanisms.Loader;
@@ -172,13 +173,8 @@ public class exampleDrive extends OpMode {
         telemetry.addData("Shooter TARGET RPM", shooterRpm);
         telemetry.addData("Shooter ACTUAL RPM", m_shooter.getShooterRPM());
         telemetry.addData("Shooter On", shooterOn);
-        telemetry.addData("backLeft Power", m_drivetrain.leftBack.getPower());
-        telemetry.addData("backLeft Current", m_drivetrain.leftBack.getCurrent(CurrentUnit.AMPS));
-
+        telemetry.addData("Serial", android.os.Build.SERIAL);
 
     }
-
-    // Only send PIDF to the hub when the Dashboard values change; writing every loop wastes bus time.
-
 
 }

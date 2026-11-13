@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
 import androidx.annotation.NonNull;
+import android.os.Build;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -30,17 +31,40 @@ import com.qualcomm.robotcore.util.Range;
 @Config
 public class Shooter2026 {
 
+    // ---- Gains (per robot, chosen by Control Hub serial) ----
+    public static double kS;
+    public static double kV;
+    public static double kP;
+    public static double NOMINAL_VOLTAGE;   // voltage the gains were tuned at
+    private static final String ROBOT_A_SERIAL = "e8bea25dfbcc6647";
+
     // ---- Gains: paste final values from the tuning guide ----
-    public static double kS = 0.24;
-    public static double kV = 0.000347;
-    public static double kP = 0.008;
-    public static double NOMINAL_VOLTAGE = 12.0;   // voltage the gains were tuned at
+    static {
+        if(ROBOT_A_SERIAL.equals(getHubSerial())){
+            kS = 0.38;
+            kV = 0.000231;
+            kP = 0.001;
+            NOMINAL_VOLTAGE = 13.58;
+        } else {
+            kS = 0.24;
+            kV = 0.000347;
+            kP = 0.008;
+            NOMINAL_VOLTAGE = 12.18;
+        }
+
+    }
+
+    @SuppressWarnings("deprecation")
+    private static String getHubSerial() {
+        return Build.SERIAL;
+    }
 
     // ---- Ready-to-shoot window ----
+
     public static double READY_TOLERANCE = 0.03;   // fraction of target (0.03 = 3%)
     public static double READY_TIME_MS = 100;      // must stay in tolerance this long
 
-    public static double SHOOT_RPM = 3500;
+    public static double SHOOT_RPM = 3300;
 
     private static final double TICKS_PER_REV = 28.0;   // motor encoder, counted at the motor shaft
 
